@@ -1,0 +1,18 @@
+Apply complete! Resources: 49 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+hostnames_masters = []
+ip_internal_load_balancer = 172.28.0.6
+ip_load_balancer = 10.86.4.96
+ip_masters = [
+  [
+    "10.86.2.116",
+  ],
+]
+ip_workers = [
+  [
+    "10.86.1.6",
+    "10.86.2.219",
+  ],
+]
