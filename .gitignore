@@ -1,2 +1,4 @@
 *tfstate*
 *.ropeproject/
+*.swp
+*.pyc
