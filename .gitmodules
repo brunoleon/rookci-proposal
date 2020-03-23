@@ -1,0 +1,3 @@
+[submodule "submodules/skuba"]
+	path = submodules/skuba
+	url = https://github.com/SUSE/skuba.git
