@@ -17,6 +17,9 @@ def parse():
                         action='append',
                         required=True,
                         help="OS to test")
+    parser.add_argument("-k", "--keep",
+                        action='store_true',
+                        help="Preserve deployment on exit")
     return vars(parser.parse_args())
 
 
@@ -63,7 +66,8 @@ class OS:
         try:
             specs = read_yaml(os.path.join(self.root, 'specs.yaml'))
             for _id in specs['cases'].keys():
-                self.cases.append(Case(self.root, _id, specs['cases'][_id]))
+                self.cases.append(Case(self.args, self.root, _id,
+                                       specs['cases'][_id]))
         except:
             logger.error('Unable to load cases for {}/{}'.format(
                 self.distrib, self.version))
@@ -75,7 +79,8 @@ class OS:
 
 
 class Case:
-    def __init__(self, root, _id, case):
+    def __init__(self, args, root, _id, case, ):
+        self.args = args
         self.root = root
         self._id = _id
         self.case = case
@@ -90,14 +95,15 @@ class Case:
                 self.case['infra']['script'],
                 self.case['infra']['master'],
                 self.case['infra']['worker'])
-            self.deploy_k8s(self.case['infra']['script'])
+            self.deploy_k8s(
+                self.name,
+                self.case['k8s']['script'])
             self.deploy_rook()
         finally:
-            self.undeploy_infra(
-                self.name,
-                self.case['infra']['script'],
-            )
-
+            if not self.args['keep']:
+                self.undeploy_infra(
+                    self.name,
+                    self.case['infra']['script'])
 
     def deploy_infra(self, name, script, master, worker):
         logger.info("Deploying infra")
@@ -120,11 +126,11 @@ class Case:
                         '--name', name],
                        cwd=root)
 
-    def deploy_k8s(self, script):
+    def deploy_k8s(self, name, script):
         logger.info("Deploying Kubernetes")
         root = os.path.join(self.root, 'deploy')
         try:
-            subprocess.run(['./{}'.format(script), cwd=root)
+            subprocess.run(['./{}'.format(script), '--name', name], cwd=root)
         except:
             raise
 
@@ -149,7 +155,7 @@ def read_yaml(template):
 def gen_random_string(prefix='', length=10):
     return '{}-{}'.format(
         prefix,
-        ''.join(random.choice(string.ascii_letters) for x in range(length)))
+        ''.join(random.choice(string.ascii_lowercase) for x in range(length)))
 
 
 main()
