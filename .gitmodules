@@ -1,3 +1,6 @@
 [submodule "submodules/skuba"]
 	path = submodules/skuba
 	url = https://github.com/SUSE/skuba.git
+[submodule "submodules/rook"]
+	path = submodules/rook
+	url = https://github.com/rook/rook.git
